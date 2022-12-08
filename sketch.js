@@ -1,3 +1,6 @@
+const RENDERMODE = 0; // 0 = default, 1 = wireframe, 2 = points
+
+
 function setup() {
     createCanvas(1200, 800);
 
@@ -81,7 +84,16 @@ function draw() {
         pointCast(render[i]);
         orderRender(render[i]);
         if (objRenderTrue(render[i])) {
-            objRender(render[i]);
+            switch (RENDERMODE) {
+                case 0:
+                    objRenderDef(render[i]);
+                    break;
+                case 1:
+                    objRenderWire(render[i]);
+                    break;
+                case 2:
+                    objRenderPoints(render[i]);
+             }
         }
     }
     cameraController();
@@ -112,7 +124,7 @@ function pointCast(obj) {
     }
 }
 
-function objRender(obj) {
+function objRenderDef(obj) {
     fill(obj.color);
     noStroke();
 
@@ -136,6 +148,58 @@ function objRender(obj) {
         //All points in front of screen
 
         triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+    }
+}
+
+function objRenderWire(obj) {
+    for (var i = 0; i < obj.trles.length; i++) {
+        obj.trles[i].d = dToTriangle(
+            obj.pts[obj.trles[i].p1],
+            obj.pts[obj.trles[i].p2],
+            obj.pts[obj.trles[i].p3]
+        );
+        obj.trles.sort(function (a, b) {
+            var x = a["d"];
+            var y = b["d"];
+            return x > y ? -1 : x < y ? 1 : 0;
+        });
+    }
+
+    for (var i = 0; i < obj.trles.length; i++) {
+        p1 = obj.spts[obj.trles[i].p1];
+        p2 = obj.spts[obj.trles[i].p2];
+        p3 = obj.spts[obj.trles[i].p3];
+        //All points in front of screen
+
+        line(p1.x, p1.y, p2.x, p2.y);
+        line(p2.x, p2.y, p3.x, p3.y);
+        line(p3.x, p3.y, p1.x, p1.y);
+    }
+}
+
+function objRenderPoints(obj) {
+    for (var i = 0; i < obj.trles.length; i++) {
+        obj.trles[i].d = dToTriangle(
+            obj.pts[obj.trles[i].p1],
+            obj.pts[obj.trles[i].p2],
+            obj.pts[obj.trles[i].p3]
+        );
+        obj.trles.sort(function (a, b) {
+            var x = a["d"];
+            var y = b["d"];
+            return x > y ? -1 : x < y ? 1 : 0;
+        });
+    }
+
+    for (var i = 0; i < obj.trles.length; i++) {
+        p1 = obj.spts[obj.trles[i].p1];
+        p2 = obj.spts[obj.trles[i].p2];
+        p3 = obj.spts[obj.trles[i].p3];
+        //All points in front of screen
+
+        point(p1.x, p1.y);
+        point(p2.x, p2.y);
+        point(p3.x, p3.y);
     }
 }
 
