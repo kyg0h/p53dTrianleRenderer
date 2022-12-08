@@ -21,7 +21,7 @@ function setup() {
         rz: 0,
         fov: 60,
         near: 1,
-        far: 10,
+        far: 1000,
         aspect: 1,
         projection: function () {
             var fov = this.fov * (Math.PI / 180);
@@ -114,7 +114,7 @@ function pointCast(obj) {
         //Project point position
         p = math.multiply(camera.view(), p);
         //Write 2d point
-        obj.spts[i] = { x: (p[0] * 90) / p[2], y: (p[1] * 90) / p[2] };
+        obj.spts[i] = { x: (p[0] * camera.fov) / p[2], y: (p[1] * camera.fov) / p[2] };
         //Check if point is behind the screen plane
         if (p[2] < 0) {
             obj.spts[i].render = false;
