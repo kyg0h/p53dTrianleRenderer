@@ -75,7 +75,7 @@ function setup() {
 }
 
 function draw() {
-    background(230);
+    background(150);
     translate(width / 2, height / 2);
 
     stroke(0);
@@ -314,6 +314,7 @@ function cameraController() {
 }
 
 function genDefaultScene() {
+    //Portal
     createCube(1, 0, 0, 0, color(200, 0, 0));
     createCube(1, 1, 0, 0, color(0, 0, 200));
     createCube(1, 2, 0, 0, color(200, 0, 0));
@@ -334,7 +335,15 @@ function genDefaultScene() {
     createCube(1, 2, 4, 0, color(200, 0, 0));
     createCube(1, 3, 4, 0, color(0, 0, 200));
 
-    createCube(4, 10, 0, -4, color(0, 0, 200));
+    //Large blue cube
+    createCube(4, 20, 0, -4, color(0, 0, 200));
+
+    //Floor
+    for(var i = -10; i <= 10; i++){
+        for(var j = -10; j <= 10; j++){
+            createCube(4, i*4, 10, j*4, color(200*((i+j)%2) + 40));
+        }
+    }
 }
 function dToTriangle(p1, p2, p3) {
     p = {
