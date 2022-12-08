@@ -1,5 +1,5 @@
 const RENDERMODE = 0; // 0 = default, 1 = wireframe, 2 = points
-
+const MOUSECAM = false; // true = mouse camera, false = keyboard camera
 
 function setup() {
     createCanvas(1200, 800);
@@ -8,7 +8,7 @@ function setup() {
 
     genDefaultScene();
 
-    posSens = 0.1;
+    posSens = 0.125;
     rotSens = 0.25;
 
     //Define Camera
@@ -22,7 +22,7 @@ function setup() {
         fov: 60,
         near: 1,
         far: 1000,
-        aspect: 1,
+        aspect: 1.5,
         projection: function () {
             var fov = this.fov * (Math.PI / 180);
             var f = Math.tan(Math.PI * 0.5 - 0.5 * fov);
@@ -299,17 +299,23 @@ function cameraController() {
         camera.y += posSens;
     }
 
-    if (leftkey) {
-        camera.ry -= rotSens;
-    }
-    if (rightkey) {
-        camera.ry += rotSens;
-    }
-    if (upkey) {
-        camera.rx += rotSens;
-    }
-    if (downkey) {
-        camera.rx -= rotSens;
+    if (MOUSECAM) {
+        camera.ry = (mouseX-width/2)/4
+        camera.rx = (mouseY-height/2)/4
+    } else {
+
+        if (leftkey) {
+            camera.ry -= rotSens;
+        }
+        if (rightkey) {
+            camera.ry += rotSens;
+        }
+        if (upkey) {
+            camera.rx += rotSens;
+        }
+        if (downkey) {
+            camera.rx -= rotSens;
+        }
     }
 }
 
