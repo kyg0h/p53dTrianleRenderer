@@ -118,7 +118,7 @@ function pointCast(obj) {
 
 function triRender(obj) {
     fill(obj.color);
-    //noStroke();
+    noStroke();
 
     for (var i = 0; i < obj.trles.length; i++) {
         obj.trles[i].d = dToTriangle(obj.pts[obj.trles[i].p1], obj.pts[obj.trles[i].p2], obj.pts[obj.trles[i].p3]);
