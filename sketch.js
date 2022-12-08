@@ -1,12 +1,12 @@
 function setup() {
-    createCanvas(1000, 800);
+    createCanvas(1200, 800);
 
-    render = []
-    
+    render = [];
+
     genDefaultScene();
 
     posSens = 0.1;
-    rotSens = 0.15;
+    rotSens = 0.25;
 
     //Define Camera
     camera = {
@@ -16,9 +16,9 @@ function setup() {
         rx: 0,
         ry: 0,
         rz: 0,
-        fov: 90,
+        fov: 60,
         near: 1,
-        far: 1000,
+        far: 10,
         aspect: 1,
         projection: function () {
             var fov = this.fov * (Math.PI / 180);
@@ -69,11 +69,9 @@ function setup() {
             ];
         },
     };
-
 }
 
 function draw() {
-    
     background(230);
     translate(width / 2, height / 2);
 
@@ -82,11 +80,11 @@ function draw() {
     for (var i = 0; i < render.length; i++) {
         pointCast(render[i]);
         orderRender(render[i]);
-        triRender(render[i]);
-        
+        if (objRenderTrue(render[i])) {
+            objRender(render[i]);
+        }
     }
     cameraController();
-    
 }
 
 function pointCast(obj) {
@@ -104,55 +102,73 @@ function pointCast(obj) {
         //Project point position
         p = math.multiply(camera.view(), p);
         //Write 2d point
-        obj.spts[i] = {x:(p[0] * 90) / p[2], y:(p[1] * 90) / p[2]}
+        obj.spts[i] = { x: (p[0] * 90) / p[2], y: (p[1] * 90) / p[2] };
         //Check if point is behind the screen plane
-        if (p[2] < 0) { 
-            obj.spts[i].render = false
-        }
-        else {
-            obj.spts[i].render = true
+        if (p[2] < 0) {
+            obj.spts[i].render = false;
+        } else {
+            obj.spts[i].render = true;
         }
     }
-    
 }
 
-function triRender(obj) {
+function objRender(obj) {
     fill(obj.color);
     noStroke();
 
     for (var i = 0; i < obj.trles.length; i++) {
-        obj.trles[i].d = dToTriangle(obj.pts[obj.trles[i].p1], obj.pts[obj.trles[i].p2], obj.pts[obj.trles[i].p3]);
-        obj.trles.sort(function(a, b) {
-            var x = a["d"]; var y = b["d"];
-            return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+        obj.trles[i].d = dToTriangle(
+            obj.pts[obj.trles[i].p1],
+            obj.pts[obj.trles[i].p2],
+            obj.pts[obj.trles[i].p3]
+        );
+        obj.trles.sort(function (a, b) {
+            var x = a["d"];
+            var y = b["d"];
+            return x > y ? -1 : x < y ? 1 : 0;
         });
     }
 
     for (var i = 0; i < obj.trles.length; i++) {
-
         p1 = obj.spts[obj.trles[i].p1];
         p2 = obj.spts[obj.trles[i].p2];
         p3 = obj.spts[obj.trles[i].p3];
         //All points in front of screen
-        if(p1.render && p2.render && p3.render) {
 
         triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+    }
+}
 
-        /* line(p1.x, p1.y, p2.x, p2.y);
-        line(p2.x, p2.y, p3.x, p3.y);
-        line(p3.x, p3.y, p1.x, p1.y); */
+function objRenderTrue(obj) {
+    
+    for (var i = 0; i < obj.trles.length; i++) {
+        if (obj.spts[obj.trles[i].p1].render && obj.spts[obj.trles[i].p2].render && obj.spts[obj.trles[i].p3].render) {
+            obj.trles[i].render = true;
+        }else {
+            obj.trles[i].render = false;
         }
     }
+
+    t = true;
+    for (var i = 0; i < obj.trles.length; i++) {
+        t = t * obj.trles[i].render;
+    }
+    return t;
 }
 
 function orderRender(obj) {
     //Order object by first triangle distance to camera
-    obj.d = dToTriangle(obj.pts[obj.trles[0].p1], obj.pts[obj.trles[0].p2], obj.pts[obj.trles[0].p3]);
+    obj.d = dToTriangle(
+        obj.pts[obj.trles[0].p1],
+        obj.pts[obj.trles[0].p2],
+        obj.pts[obj.trles[0].p3]
+    );
     render.sort(function (a, b) {
-        var x = a["d"]; var y = b["d"];
-        return ((x > y) ? -1 : ((x < y) ? 1 : 0));
-    })
- }
+        var x = a["d"];
+        var y = b["d"];
+        return x > y ? -1 : x < y ? 1 : 0;
+    });
+}
 
 function createCube(size, x, y, z, color) {
     render.push({
@@ -166,7 +182,7 @@ function createCube(size, x, y, z, color) {
             { x: x, y: y, z: z + size },
             { x: x + size, y: y, z: z + size },
             { x: x + size, y: y + size, z: z + size },
-            { x: x, y: y + size, z: z + size }
+            { x: x, y: y + size, z: z + size },
         ],
         trles: [
             { p1: 0, p2: 1, p3: 2 },
@@ -182,8 +198,8 @@ function createCube(size, x, y, z, color) {
             { p1: 4, p2: 5, p3: 1 },
             { p1: 4, p2: 1, p3: 0 },
         ],
-        spts: []
-    })
+        spts: [],
+    });
 }
 
 function cameraController() {
@@ -211,7 +227,7 @@ function cameraController() {
     if (dkey) {
         camera.x += posSens;
     }
-    
+
     if (spacekey) {
         camera.y -= posSens;
     }
@@ -231,8 +247,6 @@ function cameraController() {
     if (downkey) {
         camera.rx -= rotSens;
     }
-
-    
 }
 
 function genDefaultScene() {
@@ -256,11 +270,19 @@ function genDefaultScene() {
     createCube(1, 2, 4, 0, color(200, 0, 0));
     createCube(1, 3, 4, 0, color(0, 0, 200));
 
-    createCube(7, 10, 0, 0, color(0, 0, 200));
+    createCube(4, 10, 0, -4, color(0, 0, 200));
 }
 function dToTriangle(p1, p2, p3) {
-    p = { x: (p1.x + p2.x + p3.x) / 3, y: (p1.y + p2.y + p3.y) / 3, z: (p1.z + p2.z + p3.z) / 3 };
-    d = sqrt((p.x - camera.x) * (p.x - camera.x) + (p.y - camera.y) * (p.y - camera.y) + (p.z - camera.z) * (p.z - camera.z));
+    p = {
+        x: (p1.x + p2.x + p3.x) / 3,
+        y: (p1.y + p2.y + p3.y) / 3,
+        z: (p1.z + p2.z + p3.z) / 3,
+    };
+    d = sqrt(
+        (p.x - camera.x) * (p.x - camera.x) +
+            (p.y - camera.y) * (p.y - camera.y) +
+            (p.z - camera.z) * (p.z - camera.z)
+    );
 
-    return d
+    return d;
 }
