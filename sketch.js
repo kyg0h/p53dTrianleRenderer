@@ -284,16 +284,20 @@ function cameraController() {
     downkey = keyIsDown(DOWN_ARROW);
 
     if (wkey) {
-        camera.z -= posSens;
+        camera.z -= cos(-camera.ry*PI/180) * posSens;
+        camera.x -= sin(-camera.ry*PI/180) * posSens;
     }
     if (skey) {
-        camera.z += posSens;
+        camera.z += cos(-camera.ry*PI/180) * posSens;
+        camera.x += sin(-camera.ry*PI/180) * posSens;
     }
     if (akey) {
-        camera.x -= posSens;
+        camera.z -= cos(-camera.ry*PI/180 + PI / 2) * posSens;
+        camera.x -= sin(-camera.ry*PI/180 + PI / 2) * posSens;
     }
     if (dkey) {
-        camera.x += posSens;
+        camera.z += cos(-camera.ry*PI/180 + PI / 2) * posSens;
+        camera.x += sin(-camera.ry*PI/180 + PI / 2) * posSens;
     }
 
     if (spacekey) {
@@ -307,7 +311,6 @@ function cameraController() {
         camera.ry = (mouseX-width/2)
         camera.rx = (mouseY-height/2)
     } else {
-
         if (leftkey) {
             camera.ry -= rotSens;
         }
@@ -321,6 +324,7 @@ function cameraController() {
             camera.rx += rotSens;
         }
     }
+    console.log(camera.ry)
 }
 
 function genDefaultScene() {
