@@ -9,7 +9,7 @@ function setup() {
     genDefaultScene();
 
     posSens = 0.125;
-    rotSens = 0.25;
+    rotSens = 0.5;
 
     //Define Camera
     camera = {
@@ -19,7 +19,7 @@ function setup() {
         rx: 0,
         ry: 0,
         rz: 0,
-        fov: 60,
+        fov: 90,
         near: 1,
         far: 1000,
         aspect: 1.5,
@@ -77,8 +77,11 @@ function setup() {
 function draw() {
     background(150);
     translate(width / 2, height / 2);
-
+    scale(1, -1);
     stroke(0);
+
+    cameraController();
+
     //Loops for every object in render array
     for (var i = 0; i < render.length; i++) {
         pointCast(render[i]);
@@ -96,7 +99,7 @@ function draw() {
              }
         }
     }
-    cameraController();
+    
 }
 
 function pointCast(obj) {
@@ -114,7 +117,7 @@ function pointCast(obj) {
         //Project point position
         p = math.multiply(camera.view(), p);
         //Write 2d point
-        obj.spts[i] = { x: (p[0] * camera.fov) / p[2], y: (p[1] * camera.fov) / p[2] };
+        obj.spts[i] = { x: (p[0]*width/2) / p[2], y: (p[1]*height/2) / p[2] };
         //Check if point is behind the screen plane
         if (p[2] < 0) {
             obj.spts[i].render = false;
@@ -178,6 +181,7 @@ function objRenderWire(obj) {
 }
 
 function objRenderPoints(obj) {
+    strokeWeight(3);
     for (var i = 0; i < obj.trles.length; i++) {
         obj.trles[i].d = dToTriangle(
             obj.pts[obj.trles[i].p1],
@@ -293,15 +297,15 @@ function cameraController() {
     }
 
     if (spacekey) {
-        camera.y -= posSens;
+        camera.y += posSens;
     }
     if (shiftkey) {
-        camera.y += posSens;
+        camera.y -= posSens;
     }
 
     if (MOUSECAM) {
-        camera.ry = (mouseX-width/2)/4
-        camera.rx = (mouseY-height/2)/4
+        camera.ry = (mouseX-width/2)
+        camera.rx = (mouseY-height/2)
     } else {
 
         if (leftkey) {
@@ -311,10 +315,10 @@ function cameraController() {
             camera.ry += rotSens;
         }
         if (upkey) {
-            camera.rx += rotSens;
+            camera.rx -= rotSens;
         }
         if (downkey) {
-            camera.rx -= rotSens;
+            camera.rx += rotSens;
         }
     }
 }
@@ -347,7 +351,7 @@ function genDefaultScene() {
     //Floor
     for(var i = -10; i <= 10; i++){
         for(var j = -10; j <= 10; j++){
-            createCube(4, i*4, 10, j*4, color(200*((i+j)%2) + 40));
+            createCube(4, i*4, -10, j*4, color(200*((i+j)%2) + 40));
         }
     }
 }
