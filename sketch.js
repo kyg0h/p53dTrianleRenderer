@@ -9,7 +9,7 @@ function setup() {
     genDefaultScene();
 
     posSens = 0.125;
-    rotSens = 0.5;
+    rotSens = 1;
 
     //Define Camera
     camera = {
@@ -324,7 +324,6 @@ function cameraController() {
             camera.rx += rotSens;
         }
     }
-    console.log(camera.ry)
 }
 
 function genDefaultScene() {
